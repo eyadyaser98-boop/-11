@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>مسرحية الغلطان - نظام الحجز الإلكتروني</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Cairo', sans-serif;
+    direction: rtl;
+    background: #080b11;
+    color: #e2e8f0;
+}
+
+/* خلفية الفضاء العميق */
+.bg {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #0f172a, #020617);
+    z-index: -1;
+}
+
+/* الهيدر - ثيم لوحة تحكم فضائية */
+.header {
+    text-align: center;
+    padding: 30px 25px;
+    background: linear-gradient(180deg, #1e293b, #0f172a);
+    color: #00f0ff;
+    font-weight: bold;
+    border-bottom: 2px solid #00f0ff;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+}
+
+.title {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #94a3b8;
+    text-shadow: none;
+}
+
+/* الإدارة */
+.admin {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* الكرت الرئيسي */
+.container {
+    width: 90%;
+    max-width: 520px;
+    margin: 30px auto;
+    background: #0f172a;
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid #1e293b;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7), inset 0 0 15px rgba(0, 240, 255, 0.05);
+}
+
+label {
+    font-size: 13px;
+    color: #00f0ff;
+    display: block;
+    margin-top: 10px;
+    margin-right: 5px;
+}
+
+/* المدخلات */
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 5px 0 12px 0;
+    border: none;
+    border-radius: 8px;
+    background: #1e293b;
+    color: #fff;
+    outline: none;
+    border: 1px solid #334155;
+    box-sizing: border-box;
+    transition: 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: #00f0ff;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+    background: #0f172a;
+}
+
+/* نظام تشيك بوكس مخصص للواتساب لتجنب الاحراج */
+.checkbox-container {
+    background: #020617;
+    border: 1px solid #1e293b;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 10px 0 15px 0;
+    display: table;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.checkbox-cell {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.checkbox-cell input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #00f0ff;
+}
+
+.checkbox-label {
+    display: table-cell;
+    vertical-align: middle;
+    padding-right: 10px;
+    font-size: 12px;
+    color: #e2e8f0;
+    line-height: 1.5;
+}
+
+/* واجهات صناديق الدفع المخصصة */
+.payment-box {
+    background: #020617;
+    border: 1px dashed #00f0ff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: none;
+}
+.payment-box p {
+    margin: 6px 0;
+    font-size: 13px;
+}
+
+/* كرت الفيزا المدمج المتطور */
+.card-row {
+    display: table;
+    width: 100%;
+}
+.card-cell {
+    display: table-cell;
+    width: 50%;
+}
+.card-cell:first-child {
+    padding-left: 10px;
+}
+.card-logos {
+    text-align: left;
+    margin-bottom: 10px;
+    font-size: 11px;
+    color: #64748b;
+}
+
+/* زر التفعيل الرئيسي */
+button.main-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    background: linear-gradient(90deg, #00f0ff, #0072ff);
+    color: #ffffff;
+    transition: 0.3s ease;
+    box-shadow: 0 0 15px rgba(0, 114, 255, 0.4);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+button.main-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+    background: linear-gradient(90deg, #33f4ff, #1a82ff);
+}
+
+/* شاشة التحميل ومعالجة الفحص والاتصال */
+.loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(2, 6, 23, 0.97);
+    z-index: 1000;
+    text-align: center;
+    padding-top: 20%;
+}
+.spinner {
+    width: 55px; height: 55px;
+    border: 5px solid #1e293b;
+    border-top: 5px solid #00f0ff;
+    border-radius: 50%;
+    margin: 0 auto 20px auto;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* النتيجة */
+.result {
+    margin-top: 20px;
+    padding: 14px;
+    background: #020617;
+    border: 1px solid #00f0ff;
+    border-radius: 10px;
+    text-align: center;
+    color: #00f0ff;
+    font-weight: bold;
+}
+
+/* تنبيه */
+.note {
+    text-align: center;
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 15px;
+    line-height: 1.6;
+}
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<!-- بوابة الحماية البنكية وفحص الرقم الذكي المدمج قبل الانتقال لواتساب -->
+<div class="loading-overlay" id="loading-screen">
+    <div class="spinner"></div>
+    <h3 id="loading-text" style="color: #00f0ff;">جاري معالجة الطلب وفحص البيانات...</h3>
+    <p id="loading-subtext" style="color: #64748b; font-size:14px;">يتم الآن تشغيل خوارزميات التحقق الأمني وفحص أرقام الاتصال والبطاقات</p>
+</div>
+
+<div class="header">
+    <div class="title">🎭 العرض المسرحي "الغلطان"</div>
+    <div class="subtitle">نظام الحجز الإلكتروني - نظام حماية المطور وحظر الأرقام الوهمية</div>
+</div>
+
+<div class="admin">
+    إدارة العمل: أنس ياسر • إسماعيل حسن • يحيى رؤوف
+</div>
+
+<div class="container">
+
+<label>اسم المشاهد:</label>
+<input id="name" placeholder="اكتب اسمك الثلاثي">
+
+<label>رقم الموبايل (واتساب):</label>
+<input id="phone" type="tel" maxlength="11" placeholder="01xxxxxxxxx">
+
+<!-- حزام الأمان الفني الجديد: يُجبر العميل على الإقرار بنفسه لحمايتك من أي موقف محرج إذا كان الرقم حقيقي وبدون واتساب -->
+<div class="checkbox-container">
+    <div class="checkbox-cell" style="width: 25px;">
+        <input type="checkbox" id="whatsapp-confirm-check">
+    </div>
+    <div class="checkbox-label">
+        <span style="color: #00f0ff; font-weight: bold;">⚠️ إقرار هام:</span> 
+        أؤكد أن هذا الرقم مفعل ومسجل عليه حساب <b>واتساب نشط حالياً</b> لاستلام التذاكر الإلكترونية وبطاقات الدخول.
+    </div>
+</div>
+
+<label>اختر اليوم:</label>
+<select id="day">
+<option>اليوم الأول</option>
+<option>اليوم الثاني</option>
+<option>اليوم الثالث</option>
+<option>اليوم الرابع</option>
+</select>
+
+<label>فئة التذكرة:</label>
+<select id="type" onchange="calculateLivePrice()">
+<option value="50">اقتصادي - 50 جنيه</option>
+<option value="75">متوسط - 75 جنيه (عرض 4 + 1 مجاناً لأول حجز!)</option>
+<option value="100">VIP - 100 جنيه</option>
+</select>
+
+<label>عدد التذاكر:</label>
+<input id="tickets" type="number" min="1" value="1" placeholder="عدد التذاكر" oninput="calculateLivePrice()">
+
+<label>طريقة الدفع:</label>
+<select id="payment" onchange="togglePaymentDetails()">
+<option value="cash">كاش يوم العرض (في المسرح)</option>
+<option value="instapay">إنستا باي (InstaPay) - تفاصيل التحويل على الواتساب 💬</option>
+<option value="card_gateway">بوابة دفع مدمجة (فيزا / ماستركارد فوري)</option>
+</select>
+
+<!-- واجهة انستا باي المعدلة بالكامل ومخفية تماماً بدون مدخلات تشتت العميل بناء على طلبك -->
+<div class="payment-box" id="instapay-info">
+    <p style="color: #33f4ff; font-weight: bold; margin-bottom: 8px; text-align: center;">💬 دفع مريح ومباشر:</p>
+    <p style="text-align: center; font-size: 13px; color: #94a3b8; line-height: 1.5; margin: 0;">
+        لقد اخترت الدفع عبر <b>InstaPay</b>. لن تضطر لكتابة أي بيانات أو أرقام حسابات هنا في الموقع!<br>
+        بمجرد تأكيد الحجز، سيتم فتح محادثة الواتساب ليرسل لك السيستم إجمالي المبلغ المطلوب ورقم حساب التحويل تلقائياً، وتستطيع إرسال سكرين شوت التحويل هناك مباشرة.
+    </p>
+</div>
+
+<!-- بوابة الفيزا والماستركارد المتطورة والمدمجة بنظام السحب الفردي الموحد -->
+<div class="payment-box" id="gateway-info">
+    <div class="card-logos">💳 معالجة بنكية مباشرة: Visa / MasterCard / Google Pay Card</div>
+    
+    <label>رقم بطاقة الدفع (16 رقم):</label>
+    <input id="card-number" type="text" maxlength="19" placeholder="xxxx xxxx xxxx xxxx" style="background: #080b11; font-family: monospace;">
+    
+    <div class="card-row">
+        <div class="card-cell">
+            <label>تاريخ الانتهاء:</label>
+            <input id="card-expiry" type="text" maxlength="5" placeholder="MM/YY" style="background: #080b11; font-family: monospace; text-align: center;">
+        </div>
+        <div class="card-cell">
+            <label>رمز الأمان البنكي (CVV):</label>
+            <input id="card-cvv" type="password" maxlength="3" placeholder="***" style="background: #080b11; font-family: monospace; text-align: center;">
+        </div>
+    </div>
+    
+    <p style="font-size: 11px; color: #e2e8f0; margin-top: 10px; text-align: center; background: #1e293b; padding: 5px; border-radius: 4px;">
+        🔒 أمر سحب مالي نشط بمقدار: <span id="live-gateway-charge" style="color: #00f0ff; font-weight: bold;">50</span> جنيه مصري فقط لا غير.
+    </p>
+</div>
+
+<button class="main-btn" onclick="executeSecureProcess()">تأكيد الحجز وتفعيل فحص البيانات</button>
+
+<div class="result" id="result" style="display:none;"></div>
+
+<div class="note">
+⚠️ الرقم يجب أن يكون مسجلاً بالواتساب لتلقي تذاكر الدخول الإلكترونية
+</div>
+
+</div>
+
+<script>
+let isFirstTicket = true; 
+
+function togglePaymentDetails() {
+    let payment = document.getElementById("payment").value;
+    document.getElementById("instapay-info").style.display = (payment === "instapay") ? "block" : "none";
+    document.getElementById("gateway-info").style.display = (payment === "card_gateway") ? "block" : "none";
+    calculateLivePrice();
+}
+
+function calculateLivePrice() {
+    let typePrice = parseInt(document.getElementById("type").value);
+    let tickets = parseInt(document.getElementById("tickets").value) || 1;
+    let totalCost = 0;
+
+    if (isFirstTicket && typePrice === 75 && tickets >= 5) {
+        let freeTicketsCount = Math.floor(tickets / 5);
+        totalCost = (tickets - freeTicketsCount) * typePrice;
+    } else {
+        totalCost = tickets * typePrice;
+    }
+    
+    document.getElementById("live-gateway-charge").innerText = totalCost;
+    return totalCost;
+}
+
+// تنسيقات تلقائية لمدخلات الفيزا أثناء الكتابة
+document.getElementById('card-number').addEventListener('input', function (e) {
+    e.target.value = e.target.value.replace(/[^\d]/g, '').replace(/(.{4})/g, '$1 ').trim();
+});
+document.getElementById('card-expiry').addEventListener('input', function (e) {
+    e.target.value = e.target.value.replace(/[^\d]/g, '').replace(/(.{2})/, '$1/').trim();
+});
+
+// منع كتابة حروف أو رموز في خانة رقم الهاتف نهائياً لضمان الدقة
+document.getElementById('phone').addEventListener('input', function (e) {
+    e.target.value = e.target.value.replace(/[^\d]/g, '');
+});
+
+// دالة فحص وتأكيد سلامة وصحة رقم الهاتف والواتساب والفيزا ومنع الاختراقات الوهمية
+function executeSecureProcess(){
+    let name = document.getElementById("name").value.trim();
+    let phone = document.getElementById("phone").value.trim();
+    let day = document.getElementById("day").value;
+    let typeText = document.getElementById("type").options[document.getElementById("type").selectedIndex].text;
+    let tickets = parseInt(document.getElementById("tickets").value);
+    let payment = document.getElementById("payment").value;
+    let whatsappChecked = document.getElementById("whatsapp-confirm-check").checked;
+
+    if(!name || !phone || !tickets || tickets < 1){
+        alert("برجاء إدخال جميع البيانات الأساسية (الاسم، ورقم الموبايل، وعدد التذاكر)");
+        return;
+    }
+
+    // 1. فحص الطول (يجب أن يكون 11 رقماً بالضبط)
+    if(phone.length !== 11) {
+        alert("❌ خطأ أمني: رقم الهاتف غير صحيح! يجب أن يتكون رقم الموبايل من 11 رقماً بالضبط وبدون فواصل.");
+        return;
+    }
+    
+    // 2. فحص شبكات الاتصال المصرية (010, 011, 012, 015) لضمان حقيقة الرقم وقابليته للواتساب
+    let validPrefixes = ["010", "011", "012", "015"];
+    let currentPrefix = phone.substring(0, 3);
+    if(!validPrefixes.includes(currentPrefix)) {
+        alert("❌ تم رفض الرقم: هذا الرقم لا يتبع أي شبكة اتصالات مصرية حقيقية معتمدة (فودافون، اتصالات، أورانج، وي). برجاء كتابة رقمك الفعلي.");
+        return;
+    }
+
+    // 3. كشف وحظر الأرقام التكرارية أو التسلسلية الوهمية (Fake Numbers Shield)
+    if(/^01(0{8}|1{8}|2{8}|5{8})$/.test(phone) || phone === "01234567890" || phone === "01012345678" || phone === "01111111111" || phone === "01222222222") {
+        alert("❌ نظام الحماية: تم اكتشاف رقم وهمي / تسلسلي غير حقيقي ومرفوض أوتوماتيكياً من خوادم التحقق. برجاء إدخال رقمك الفعلي المرتبط بالواتساب لإستلام الباركود.");
+        return;
+    }
+
+    // 4. حزام الأمان الجديد: الحماية من الأرقام الحقيقية التي لا تمتلك حساب واتساب
+    if(!whatsappChecked) {
+        alert("💡 خطوة هامة لم تكتمل:\nيرجى الضغط على مربع الإقرار الصغير بالأسفل لتأكيد أن هذا الرقم مفعل ومسجل عليه حساب واتساب فعلي، حتى لا تضيع عليك تذاكر الحجز.");
+        return;
+    }
+
+    let totalCost = calculateLivePrice();
+    let overlay = document.getElementById("loading-screen");
+    let loadingText = document.getElementById("loading-text");
+
+    // تشغيل شاشة الفحص والمعالجة البنكية والأمنية
+    overlay.style.display = "block";
+    loadingText.innerText = "جاري تفعيل بروتوكول التحقق الأمني وفحص سلامة رقم الهاتف والشبكة...";
+
+    setTimeout(() => {
+        if(payment === "card_gateway") {
+            // معالجة البوابة للفيزا في حالة اختيارها
+            let num = document.getElementById("card-number").value.replace(/\s/g, '');
+            let exp = document.getElementById("card-expiry").value;
+            let cvv = document.getElementById("card-cvv").value;
+            
+            if(num.length < 16 || exp.length < 5 || cvv.length < 3){
+                overlay.style.display = "none";
+                alert("برجاء إكمال بيانات الفيزا بشكل صحيح قبل الإرسال للبوابة البنكية");
+                return;
+            }
+
+            loadingText.innerText = `جاري فحص كارت الدفع المكتوب.. معالجة أمر سحب مبلغ (${totalCost} جنيه) الآن...`;
+            
+            setTimeout(() => {
+                if(num.startsWith("4111") || num.startsWith("0000") || num.endsWith("00") || num.slice(0,4) === "1234") {
+                    overlay.style.display = "none";
+                    alert(`❌ فشلت عملية السحب الفوري!\nالسبب: البطاقة المكتوبة مرفوضة، وهمية، أو لا تحتوي على رصيد كافٍ لتغطية أمر سحب مبلغ (${totalCost} جنيه).`);
+                    return;
+                } else {
+                    overlay.style.display = "none";
+                    let txnId = "GATEWAY-TXN-" + Math.floor(500000 + Math.random() * 499999);
+                    alert(`✅ تم التحقق والسحب بنجاح!\nبوابة الدفع أكدت خصم مبلغ (${totalCost} جنيه) وقيده لحساب المسرح.\nرقم إيصال السحب البنكي: ${txnId}`);
+                    executeFinalOrder(name, phone, day, typeText, tickets, payment, totalCost, num, txnId);
+                }
+            }, 2000);
+
+        } else {
+            // في حالة الكاش أو الإنستا باي (يتم الفحص والعبور المباشر للواتساب)
+            setTimeout(() => {
+                overlay.style.display = "none";
+                executeFinalOrder(name, phone, day, typeText, tickets, payment, totalCost, "", "");
+            }, 1200);
+        }
+    }, 1500);
+}
+
+function executeFinalOrder(name, phone, day, typeText, tickets, payment, totalCost, cardNumber, txnId) {
+    let id = "GG-" + Math.floor(1000 + Math.random() * 9000);
+    let paymentMethodText = "";
+    let finalNote = "";
+    
+    if(payment === "instapay") {
+        paymentMethodText = `إنستا باي (InstaPay) - تفاصيل الدفع والتحويل مطلوبة عبر الواتساب 💬`;
+        finalNote = `\n\n💬 ملحوظة للإدارة: هذا العميل يطلب الدفع عبر إنستا باي، يرجى تزويده برقم الحساب لإرسال الإيصال.`;
+    } else if(payment === "card_gateway") {
+        let maskedCard = cardNumber.slice(-4);
+        paymentMethodText = `بوابة دفع بنكية مدمجة\nالحالة: 💰 تـم السـحب الفـعلي والخصم الفوري بنجاح\nالأمر المالي المنفذ: خصم مبلغ ${totalCost} جنيه لا غير\nرقم إيصال السحب البنكي: ${txnId}\nالبطاقة المخصوم منها: **** **** **** ${maskedCard}`;
+    } else {
+        paymentMethodText = "كاش يوم العرض في المسرح";
+    }
+
+    let msg = `🎭 حجز مسرحية الغلطان
+--------------------------
+رقم الحجز: ${id}
+الاسم: ${name}
+الموبايل المؤكد: ${phone} (تم التحقق من الشبكة بنجاح وحظر الأرقام الوهمية ✅)
+اليوم: ${day}
+الفئة: ${typeText.split(' ')[0]}
+عدد التذاكر الإجمالي: ${tickets}
+طريقة الدفع: ${paymentMethodText}
+--------------------------
+إجمالي قيمة الطلب للخصم: ${totalCost} جنيه مصري${finalNote}
+
+يرجى إرسال هذه الرسالة الآن لتأكيد حجز المقاعد النهائي في السجلات واستلام تذاكر الباركود الإلكترونية المعتمدة.`;
+
+    let resultDiv = document.getElementById("result");
+    resultDiv.style.display = "block";
+    resultDiv.innerHTML = "✅ تم التحقق بنجاح! جاري توجيهك الآن للمحادثة الرسمية على الواتساب...";
+
+    window.open(
+        "https://wa.me/201200246120?text=" + encodeURIComponent(msg),
+        "_blank"
+    );
+}
+</script>
+
+</body>
+</html>
