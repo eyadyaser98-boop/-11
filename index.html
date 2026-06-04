@@ -495,11 +495,8 @@ function executeFinalOrder(name, phone, day, typeText, tickets, payment, totalCo
     let resultDiv = document.getElementById("result");
     resultDiv.style.display = "block";
     resultDiv.innerHTML = "✅ تم التحقق بنجاح! جاري توجيهك الآن للمحادثة الرسمية على الواتساب...";
-
-    window.open(
-        "https://wa.me/201200246120?text=" + encodeURIComponent(msg),
-        "_blank"
-    );
+window.location.href =
+"https://wa.me/201200246120?text=" + encodeURIComponent(msg);
 }
 </script>
 
